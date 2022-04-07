@@ -14,6 +14,7 @@ func InitServer() *echo.Echo {
 	e.Use(middleware.Logger())
 
 	person.GET(":id/get", handler.APIGetPersonInfo)
+	person.POST("create", handler.APIAddPersonInfo)
 
 	return e
 }

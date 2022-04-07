@@ -3,7 +3,7 @@ use cetec;
 
 /*Person*/
 create table person(
-	id int not null key AUTO_INCREMENT,
+	id int not null primary key AUTO_INCREMENT,
   	name varchar(255), 
 	age int
 );
@@ -20,7 +20,8 @@ create table phone
 (
 	id int not null key AUTO_INCREMENT,  
 	number varchar(255), 
-	person_id INT
+	person_id INT,
+	foreign key(person_id) references person(id)
 );
 
 insert into phone(id, person_id, NUMBER) 
@@ -32,11 +33,11 @@ VALUES
 
 /*address*/
 create table address(
-	id int not null key auto_increment,  
-	city varchar(255), 
-	state varchar(255), 
-	street1 varchar(255), 
-	street2 varchar(255), 
+	id int not null primary key auto_increment,  
+	city varchar(255),
+	state varchar(255),
+	street1 varchar(255),
+	street2 varchar(255),
 	zip_code varchar(255)
 );
 
@@ -51,7 +52,9 @@ VALUES
 create table address_join(
 	id int not null key auto_increment,  
 	person_id int, 
-	address_id int
+	foreign key(person_id) references person(id),
+	address_id int,
+	foreign key(address_id) references address(id)
 );
 insert into address_join(id, person_id, address_id) 
 VALUES 

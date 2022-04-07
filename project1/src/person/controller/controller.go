@@ -27,3 +27,33 @@ func ConGetPersonByID(id string) (error, *model.PersonInfo) {
 	errMsg := "No Record Found"
 	return errors.New(errMsg), nil
 }
+
+func ConAddPerson(personInfo model.PersonInfo) error {
+
+	row, err := db.Query("CALL `AddPersonInfo`(?, ?, ?, ?, ?, ?, ?)",
+		personInfo.Name, personInfo.PhoneNumber, personInfo.City,
+		personInfo.State, personInfo.Street1, personInfo.Street2,
+		personInfo.ZipCode)
+	if err != nil {
+		return err
+	}
+	defer row.Close()
+	var isSuccesful int
+	if row.Next() {
+		err = row.Scan(&isSuccesful)
+		if err != nil {
+			return err
+		}
+	}
+	if isSuccesful == 1 {
+		return nil
+	} else {
+		_ = row.NextResultSet() && row.Next()
+		var errMsg string
+		err = row.Scan(&errMsg)
+		if err != nil {
+			return err
+		}
+		return errors.New(errMsg)
+	}
+}
