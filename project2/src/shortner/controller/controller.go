@@ -1,15 +1,11 @@
 package controller
 
 import (
-	"crypto/sha256"
 	"errors"
 	"fmt"
-	"math/big"
-	"os"
 	obj "projects/project2/sqlconnect"
+	linkshortner "projects/project2/src/Linkshortner"
 	"projects/project2/src/shortner/model"
-
-	"github.com/itchyny/base58-go"
 )
 
 var db = obj.InitSQL()
@@ -33,7 +29,7 @@ func CreateShortUrl(longURL model.ShortLongURL) (error, *model.ShortLongURL) {
 	fmt.Println("isExist:", isExist)
 	host := "http://localhost:9000/"
 	if isExist == 0 {
-		shortenUrl = GenerateShortLink(longURL.URL)
+		shortenUrl = linkshortner.GenerateShortLink(longURL.URL)
 		err := SaveUrlMapping(shortenUrl, longURL.URL)
 		if err != nil {
 			return err, nil
@@ -75,29 +71,6 @@ func SaveUrlMapping(shortURL, LongURL string) error {
 		}
 		return errors.New(errMsg)
 	}
-}
-
-func GenerateShortLink(longURL string) string {
-	urlHashBytes := sha256Of(longURL)
-	generatedNumber := new(big.Int).SetBytes(urlHashBytes).Uint64()
-	finalString := base58Encoded([]byte(fmt.Sprintf("%d", generatedNumber)))
-	return finalString[:8]
-}
-
-func sha256Of(input string) []byte {
-	algorithm := sha256.New()
-	algorithm.Write([]byte(input))
-	return algorithm.Sum(nil)
-}
-
-func base58Encoded(bytes []byte) string {
-	encoding := base58.BitcoinEncoding
-	encoded, err := encoding.Encode(bytes)
-	if err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
-	}
-	return string(encoded)
 }
 
 func ConShortUrlRedirect(shortURL string) (error, string) {
